@@ -4,7 +4,7 @@
 
 ## 实现功能简介
 
-
+针对作业中提供的训练集 `ex2data1.txt` 和 `ex2data2.txt` ，将分类任务转换为回归模型，绘制散点、求代价、梯度和决策边界，并且以此进行预测。
 
 ## 编写代码详述
 
@@ -346,7 +346,124 @@ $$
 J(\theta) = – \left[ \frac{1}{m} \sum_{i = 1}^{m} \left( y^{(i)} log(h(x^{(i)})) + (1-y^{(i)}) log\left(1-h(x^{(i)})\right) \right) \right] + \frac{\lambda}{2m} \sum_{j=1}^{n} \theta_j^2
 $$
 
-非线性的代价计算公式我们增加了一个新的项目 $(\frac{\lambda}{2m} \sum_{j=1}^{n} \theta_j^2)$ ，$\theta_0$ 和之前相同
+非线性的代价计算公式我们增加了一个新的项目 $(\frac{\lambda}{2m} \sum_{j=1}^{n} \theta_j^2)$ ，$\theta_0$ 和之前相同。
+
+具体的实现代码如下：
+
+``` matlab
+hx = sigmoid(X * theta);
+J = (-1/m) * sum(y .* log(hx) + (1-y) .* log(1 - hx)) + (lambda/(2*m)) * (sum(theta .* theta) - theta(1)^2);
+```
+
+这里面我们要记得减去 $\theta_1$ 的平方，因为本身代码中不包含 $\theta_0$ 。
+
+我们根据非线性的代价公式的偏微分，推导出我们使用的 **梯度计算公式** :
+
+$$
+\frac{\partial}{\partial \theta_0} J(\theta) = \frac{1}{m} \sum_{i=1}^{m} \left(h(x^{(i)}) – y^{(i)}\right) x_0^{(i)}
+$$
+
+$$
+\frac{\partial}{\partial \theta_j} J(\theta) = \left( \frac{1}{m} \sum_{i=1}^{m} \left(h(x^{(i)}) – y^{(i)}\right) x_j^{(i)} \right) + \frac{\lambda}{m}\theta_j
+$$
+
+``` matlab
+grad(1,1) = (1 / m *(predictions - y)' * X(:,1));
+grad(2:n, 1) = (1 / m * (predictions - y)' * X(:,2:n) )'+ 1 / m * lambda * theta(2:n,1);
+```
+
+最后我们得到的全部的代价和梯度的代码为：
+
+``` matlab
+function [J, grad] = costFunctionReg(theta, X, y, lambda)
+%COSTFUNCTIONREG Compute cost and gradient for logistic regression with regularization
+%   J = COSTFUNCTIONREG(theta, X, y, lambda) computes the cost of using
+%   theta as the parameter for regularized logistic regression and the
+%   gradient of the cost w.r.t. to the parameters. 
+% Initialize some useful values
+m = length(y); % number of training examples
+J = 0;
+grad = zeros(size(theta));
+hx = sigmoid(X * theta);         % m x 1 predictions of hypothesis on all m examples
+J = 1 / m * (-y'*log(hx) - (1 - y)' * log(1 - hx)) + 1 / (2 * m) * lambda * (theta' * theta - (theta(1, 1))^2);   % cost function
+n = size(theta);
+grad(1,1) = (1 / m *(predictions - y)' * X(:,1));
+grad(2:n, 1) = (1 / m * (predictions - y)' * X(:,2:n) )'+ 1 / m * lambda * theta(2:n,1);%+ 
+end
+```
+
+#### 决策边界
+
+这部分决策边界的绘制程序也已经实现了：
+
+``` matlab
+else
+    % Here is the grid range
+    u = linspace(-1, 1.5, 50);
+    v = linspace(-1, 1.5, 50);
+    z = zeros(length(u), length(v));
+    % Evaluate z = theta*x over the grid
+    for i = 1:length(u)
+        for j = 1:length(v)
+            z(i,j) = mapFeature(u(i), v(j))*theta;
+        end
+    end
+    z = z'; % important to transpose z before calling contour
+    % Plot z = 0
+    % Notice you need to specify the range [0, 0]
+    contour(u, v, z, [0, 0], 'LineWidth', 2)
+end
+```
+
+绘制出非线性的决策边界的图：
+
+![](homework2/3.bmp)
+
+输出的结果如下，$\theta = 0.6931$ 准确率为：$83.05\%$ 
+
+``` matlab
+Cost at initial theta (zeros): 0.693147
+Program paused. Press enter to continue.
+Local minimum possible.
+fminunc stopped because the final change in function value relative to 
+its initial value is less than the default value of the function tolerance.
+<stopping criteria details>
+Train Accuracy: 83.050847
+```
+
+完成了 $\lambda = 1$ 的情况，我们还要针对不同的数据去进行测试，这里我们选择了 0 和 30 作为参考量进行分析。
+
+![](homework2/5.bmp)
+
+$\lambda = 0$ 情况下的程序输出为：
+
+``` matlab
+Cost at initial theta (zeros): 0.693147
+Program paused. Press enter to continue.
+Solver stopped prematurely.
+fminunc stopped because it exceeded the iteration limit,
+options.MaxIter = 400 (the selected value).
+Train Accuracy: 87.288136
+```
+
+![](homework2/7.bmp)
+
+$\lambda = 30 $ 情况下的程序输出为：
+
+``` matlab
+Cost at initial theta (zeros): 0.693147
+Program paused. Press enter to continue.
+Local minimum possible.
+fminunc stopped because the final change in function value relative to 
+its initial value is less than the default value of the function tolerance.
+<stopping criteria details>
+Train Accuracy: 67.796610
+```
+
+根据分析结果，当 $\lambda = 0$ 决策边界变得特别复杂，但是拟合率也相应的上升了，上升到了$87\%$ 以上，但是本身也出现了一些过度拟合的问题。但是当 $\lambda=30$ 曲线虽然变的更为平滑，但是你和率下降到了 $67\%$ 决策边界不能很好地反应数据。
 
 ## 总结
 
+本次作业中我主要接触了逻辑分析和代价计算、梯度下降、求决策边界等方面的具体知识。相比于上一次作业中的我们进行的一些尝试（只能说是浅尝辄止），这次我们进行了一些更多、更为深入的了解和学习。我个人比较感兴趣的方向是和 PLT 相关的方向，多是和编程语言的发展、设计、证明相关的知识，平时在这方面的实践仅限于一些编译器、解释器的构造。在 Machine Learning 方向上的尝试和实践让我有了很多的长进，无论是在知识方面的，还是在对一些工具方面的使用上的。
+
+机器学习在这些年的不断发展让这个学科和领域让这个学科备受瞩目，基于学习的程序和设计实现为我们提供了一种新的思路和方式去理解现在的生物甚至是人。比如最近我们将机器学习运用在了围棋 AI 上面了，在去年击败李世石之后今年又击败了现在的世界第一柯洁。这种 AI 的学习和设计方式是以往 AI 使用自动机方式设计的一个很大的长进
