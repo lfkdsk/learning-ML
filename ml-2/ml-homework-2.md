@@ -284,11 +284,11 @@ Train Accuracy: 89.000000
 Program paused. Press enter to continue.
 ```
 
-## Polynomial regression + regularizition
+### Polynomial regression + regularizition
 
-### 绘制散点图
+#### 绘制散点图
 
-我们之前已经实现过这个
+我们之前已经实现过 `plotData()` 这个方法，所以我们直接就可以调用绘制：
 
 ``` matlab
 data = load('ex2data2.txt');
@@ -304,9 +304,49 @@ legend('y = 1', 'y = 0')
 hold off;
 ```
 
+绘制出的 **散点图** 如下：
 
+![](homework2/4.bmp)
 
+根据注释提示和从图中观察，我们发现我们这次的数据和上面不一样，并不是线性的，我们需要根据公示去构建非线性的分类。
 
+#### 代价和梯度
+
+``` matlab
+%% =========== Part 1: Regularized Logistic Regression ============
+%  In this part, you are given a dataset with data points that are not
+%  linearly separable. However, you would still like to use logistic 
+%  regression to classify the data points. 
+%  To do so, you introduce more features to use -- in particular, you add
+%  polynomial features to our data matrix (similar to polynomial
+%  regression).
+% Add Polynomial Features
+% Note that mapFeature also adds a column of ones for us, so the intercept
+% term is handled
+X = mapFeature(X(:,1), X(:,2));
+```
+
+`mapFeature` 这个方法本身也已经被实现了，我们使用已有的特征的幂来当做新的特征，这里最高6次幂：
+
+``` matlab
+function out = mapFeature(X1, X2)
+degree = 6;
+out = ones(size(X1(:,1)));
+for i = 1:degree
+    for j = 0:i
+        out(:, end+1) = (X1.^(i-j)).*(X2.^j);
+    end
+end
+end
+```
+
+我们在非线性的条件下使用的非线性 **代价计算公式**：
+
+$$
+J(\theta) = – \left[ \frac{1}{m} \sum_{i = 1}^{m} \left( y^{(i)} log(h(x^{(i)})) + (1-y^{(i)}) log\left(1-h(x^{(i)})\right) \right) \right] + \frac{\lambda}{2m} \sum_{j=1}^{n} \theta_j^2
+$$
+
+非线性的代价计算公式我们增加了一个新的项目 $(\frac{\lambda}{2m} \sum_{j=1}^{n} \theta_j^2)$ ，$\theta_0$ 和之前相同
 
 ## 总结
 
