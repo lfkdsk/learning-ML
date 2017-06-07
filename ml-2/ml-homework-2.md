@@ -203,7 +203,7 @@ grad = 1 / m * X' * (sigmoid(X * theta) - y);
 end
 ```
 
-#### 最佳参数 $\theta$ 
+#### 决策边界 
 
 根据 **Part 3: Optimizing using fminunc** 的要求和代码的提示：
 
@@ -222,7 +222,56 @@ plotDecisionBoundary(theta, X, y);
 
 我们分析上面的代码，`@(t)(costFunction(t, X, y)) ` 是为了把函数 costFunction 转换为只接受一个参数 t 的函数，之后我们调用了 `plotDecisionBoundary` 画出点和决策边界。
 
-在这之前我们在 **散点图绘制** 中得到的结果，我们可以发现这其中的
+在这之前我们在 **散点图绘制** 中得到的结果，我们可以发现这其中的数据有明显的分界线，并且通过 costFunction 计算出在 $\theta = 0$ 时，初始的距离与其的偏微分。将其导入最小化函数中，得到相应的 $\theta$ 与其的偏微分，就可以绘制出一条所有样本到其的欧氏距离之和最小的直线，这就是我们画出的这条决策边界。
+
+![](homework2/2.bmp)
+
+####  预测
+
+在从 **Part 3** 中获取到参数之后，我们就可以进行相关的预测和分析了，$ \theta ^Tx >0 $ 的时候，$h(x) > 0.5$   应该预测结果为 1 ，当 $ \theta ^Tx <0 $ 时，$h(x) < 0.5$ 应该预测结果为 0。
+
+因此我们在 `predict.m` 中的实现代码为：
+
+``` matlab
+function p = predict(theta, X)
+%PREDICT Predict whether the label is 0 or 1 using learned logistic 
+%regression parameters theta
+%   p = PREDICT(theta, X) computes the predictions for X using a 
+%   threshold at 0.5 (i.e., if sigmoid(theta'*x) >= 0.5, predict 1)
+m = size(X, 1); % Number of training examples
+% You need to return the following variables correctly
+p = zeros(m, 1);
+p(sigmoid(X*theta)>0.5)=1; 
+end
+```
+
+这里我们按照
+
+``` matlab
+Plotting data with + indicating (y = 1) examples and o indicating (y = 0) examples.
+Program paused. Press enter to continue.
+Cost at initial theta (zeros): 0.693147
+Gradient at initial theta (zeros): 
+ -0.100000 
+ -12.009217 
+ -11.262842 
+Program paused. Press enter to continue.
+Local minimum possible.
+fminunc stopped because the final change in function value relative to 
+its initial value is less than the default value of the function tolerance.
+<stopping criteria details>
+Cost at theta found by fminunc: 0.203506
+theta: 
+ -24.932920 
+ 0.204407 
+ 0.199617 
+Program paused. Press enter to continue.
+For a student with scores 45 and 85, we predict an admission probability of 0.774323
+Train Accuracy: 89.000000
+Program paused. Press enter to continue.
+```
+
+
 
 ## 总结
 
