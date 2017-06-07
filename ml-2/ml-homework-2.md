@@ -226,7 +226,20 @@ plotDecisionBoundary(theta, X, y);
 
 ![](homework2/2.bmp)
 
-####  预测
+#### 预测
+
+``` matlab
+%% ============== Part 4: Predict and Accuracies ==============
+%  After learning the parameters, you'll like to use it to predict the outcomes
+%  on unseen data. In this part, you will use the logistic regression model
+%  to predict the probability that a student with score 20 on exam 1 and 
+%  score 80 on exam 2 will be admitted.
+%  Furthermore, you will compute the training and test set accuracies of 
+%  our model.
+%  Your task is to complete the code in predict.m
+%  Predict probability for a student with score 45 on exam 1 
+%  and score 85 on exam 2 
+```
 
 在从 **Part 3** 中获取到参数之后，我们就可以进行相关的预测和分析了，$ \theta ^Tx >0 $ 的时候，$h(x) > 0.5$   应该预测结果为 1 ，当 $ \theta ^Tx <0 $ 时，$h(x) < 0.5$ 应该预测结果为 0。
 
@@ -245,7 +258,7 @@ p(sigmoid(X*theta)>0.5)=1;
 end
 ```
 
-这里我们按照
+这里我们按照程序中的提示传入 45 和 85 的成绩，输出的结果为：
 
 ``` matlab
 Plotting data with + indicating (y = 1) examples and o indicating (y = 0) examples.
@@ -270,6 +283,28 @@ For a student with scores 45 and 85, we predict an admission probability of 0.77
 Train Accuracy: 89.000000
 Program paused. Press enter to continue.
 ```
+
+## Polynomial regression + regularizition
+
+### 绘制散点图
+
+我们之前已经实现过这个
+
+``` matlab
+data = load('ex2data2.txt');
+X = data(:, [1, 2]); y = data(:, 3);
+plotData(X, y);
+% Put some labels 
+hold on;
+% Labels and Legend
+xlabel('Microchip Test 1')
+ylabel('Microchip Test 2')
+% Specified in plot order
+legend('y = 1', 'y = 0')
+hold off;
+```
+
+
 
 
 
