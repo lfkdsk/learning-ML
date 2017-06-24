@@ -12,7 +12,7 @@
 
 在讨论具体的编码实现之中，我们可以对我们的程序文件进行逐个分析并简述功能和结果。在本部分之中我们会逐步分析 `ex3.m` 和 `ex3_pca.m` 两个文件中的各个 Part 去逐渐的完成这几个 Task 的功能，最终达到完成本次题目并且最终了解与逻辑回归相关知识的目的。
 
-我们首先来分析 `ex3.m` 中的代码实现，来分析 K-Means 的具体实现：
+* 我们首先来分析 `ex3.m` 中的代码实现，来分析 K-Means 的具体实现：
 
 ``` matlab
 %  To help you implement K-Means, we have divided the learning algorithm 
@@ -23,12 +23,6 @@
 
 ![pic](./pic1.png)
 
-``` matlab
-randidx = randperm(size(X, 1));
-centroids = X(randidx(1:K), :);
-```
-
-每一轮程序的运行之后，都会生成出一组质心，我们在程序的初始化之前也要提供一组初始化的数据。     **kMeansInitCentroids** 中心初始化，随机选取k个聚类质心点（cluster centroids）为![](http://images.cnblogs.com/cnblogs_com/jerrylead/201104/201104061601454064.png) ，将选中的元素作为初始中心。函数输入X和K值，返回**centroids**。
 
 ### Find Closest Centroids
 
@@ -78,9 +72,7 @@ fprintf('\nComputing centroids means.\n\n');
 centroids = computeCentroids(X, idx, K);
 ```
 
-接着我们来实现文本中的第二部分中的程序内容，在完成最近质心的计算之后需要完成质心的聚合方法：
-
-我们调用 **computeCentroids** 部分的具体程序，并且传入了我们在上一步中计算出的一些计算结果。
+接着我们来实现文本中的第二部分中的程序内容，在完成最近质心的计算之后需要完成质心的计算方法，我们调用 **computeCentroids** 部分的具体程序，并且传入了我们在上一步中计算出的一些计算结果：
 
 ``` matlab
 for i=1:K
@@ -92,7 +84,9 @@ for i=1:K
 end;
 ```
 
- 这里我们在里循环的每次迭代之后都计算了一个质点的均值，以便于在每次的迭代之后能更新出我们对应的质心的特征向量。
+ 写成公式：![img](http://img.blog.csdn.net/20130615224238828)
+
+这里我们在里循环的每次迭代之后都计算了一个质点的均值，以便于在每次的迭代之后能更新出我们对应的质心的特征向量。
 
 输出：
 
@@ -113,7 +107,18 @@ end;
 
 ![pic2](./Homework3/pic2.bmp)
 
+从这张图中我们能非常清晰的看出在10轮运算之中，质心在每一轮更新之后的状态。
 
+* 接着我们在程序中引入 **Principal components analysis** 
+
+**K-Means** 的优势十分明显，但是缺点也是令人一目了然的：
+
+> * 聚类数目*k*是一个输入参数。选择不恰当的*k*值可能会导致糟糕的聚类结果。
+> * 收敛到局部最优解，可能导致“反直观”的错误结果
+
+K-Means 在引入大量数据的时候，可能会出现数据维度过高的情况出现，这种情况下，无论是分析我们的程序还是理解输出都为给我们造成很大的困扰。PCA 就是这样的一个用作 `降维` 的方法，PCA 不是一种经常使用的计算方法，因为降低维度本身是一种对数据的加工，如果我们没有
+
+### Load Example Dataset
 
 
 
