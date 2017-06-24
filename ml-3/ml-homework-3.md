@@ -72,9 +72,46 @@ end
 %  After implementing the closest centroids function, you should now
 %  complete the computeCentroids function.
 %
+fprintf('\nComputing centroids means.\n\n');
+
+%  Compute means based on the closest centroids found in the previous part.
+centroids = computeCentroids(X, idx, K);
 ```
 
 接着我们来实现文本中的第二部分中的程序内容，在完成最近质心的计算之后需要完成质心的聚合方法：
+
+我们调用 **computeCentroids** 部分的具体程序，并且传入了我们在上一步中计算出的一些计算结果。
+
+``` matlab
+for i=1:K
+    list = find(idx==i);
+    for j=1:size(list,1)
+        centroids(i,:)=centroids(i,:)+X(list(j),:);
+    end;
+    centroids(i,:)=centroids(i,:)./size(list,1);
+end;
+```
+
+ 这里我们在里循环的每次迭代之后都计算了一个质点的均值，以便于在每次的迭代之后能更新出我们对应的质心的特征向量。
+
+输出：
+
+![lfk1](./lfk1.png)
+
+### K-Means Clustering
+
+``` matlab
+%% =================== Part 3: K-Means Clustering ======================
+%  After you have completed the two functions computeCentroids and
+%  findClosestCentroids, you have all the necessary pieces to run the
+%  kMeans algorithm. In this part, you will run the K-Means algorithm on
+%  the example dataset we have provided. 
+%
+```
+
+在完成两个方法之后我们可以运行 **K-Means ** 算法了。
+
+![pic2](./Homework3/pic2.bmp)
 
 
 
@@ -82,3 +119,4 @@ end
 
 ## 课程总结
 
+精彩而又有趣的机器学习课程落下了帷幕，短短几周的课程让我们感到受益匪浅，我们不但学习了很多有用的理论知识，而且还学到了很多 ML 进行实践操作的技巧，这令我非常的满足和高兴。前一段时间参加了一个在线的 Hackathon 活动，我们在几个小时中开发了一个基于 ML 的小程序，我们参照了一些前辈的 Demo 和思路，分析 MIDI 的文件格式，并且通过一些学习框架提供的神经网络学习的功能，实现了自动生产风格相近的 MIDI 电子乐的功能，做了一部分有趣的风格歉意
