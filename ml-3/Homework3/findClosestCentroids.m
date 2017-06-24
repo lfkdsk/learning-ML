@@ -22,16 +22,17 @@ idx = zeros(size(X,1), 1);
 %
 
 
-for i=1:size(X,1)
-    idx(i)=1;
-    for j =1:K
-        if norm(X(i,:)-centroids(idx(i),:)) > norm(X(i,:)-centroids(j,:))
-            idx(i)=j;
-        end;
-    end;
-end;   
-  
-
+for i=1:size(X,1)  
+    adj = sqrt((X(i,:)-centroids(1,:))*(X(i,:)-centroids(1,:)));  
+    idx(i)=1;  
+    for j=2:K  
+        temp=sqrt((X(i,:)-centroids(j,:))*(X(i,:)-centroids(j,:)));  
+        if(temp<adj)  
+            idx(i)=j;  
+            adj=temp;  
+        end  
+    end 
+end  
 
 
 
