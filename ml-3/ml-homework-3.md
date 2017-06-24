@@ -155,7 +155,37 @@ sigma = X' * X / m;     % 2:协方差
 [U,S,V] = svd(sigma);   % 3:利用 Matlab 中 SVD 函数计算
 ```
 
-这里的程序确实比较简单，只是在
+这里的程序确实比较简单，只是在实现我们之前对 PCA 步骤的描述中公式的程序实现。
+
+![](./fic.png)
+
+在图中我们清晰地看到了里面出现的特征向量的绘制。
+
+### Dimension Reduction
+
+``` matlab
+%% =================== Part 3: Dimension Reduction ===================
+%  You should now implement the projection step to map the data onto the 
+%  first k eigenvectors. The code will then plot the data in this reduced 
+%  dimensional space.  This will show you what the data looks like when 
+%  using only the corresponding eigenvectors to reconstruct it.
+%
+%  You should complete the code in projectData.m
+```
+
+我们在 `projectData.m` 文件中实现了将矩阵降到K维，输入为X,U,K，输出为Z。
+
+``` matlab
+% Instructions: Compute the projection of the data using only the top K 
+%               eigenvectors in U (first K columns). 
+%               For the i-th example X(i,:), the projection on to the k-th 
+%               eigenvector is given as follows:
+%                    x = X(i, :)';
+%                    projection_k = x' * U(:, k);
+%
+% 更新新维度下的 X 
+Z = X * U(:,1:K); 
+```
 
 
 
