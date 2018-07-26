@@ -18,7 +18,8 @@ pd.options.display.float_format = '{:.1f}'.format
 
 california_housing_dataframe = pd.read_csv("https://dl.google.com/mlcc/mledu-datasets/california_housing_train.csv", sep=",")
 california_housing_dataframe = california_housing_dataframe.reindex(
-    np.random.permutation(california_housing_dataframe.index))
+    np.random.permutation(california_housing_dataframe.index)).reset_index(drop=True)
+
 
 def preprocess_features(california_housing_dataframe):
   """Prepares input features from California housing data set.
@@ -60,6 +61,49 @@ def preprocess_targets(california_housing_dataframe):
   output_targets["median_house_value"] = (
     california_housing_dataframe["median_house_value"] / 1000.0)
   return output_targets
+
+
+training_examples = preprocess_features(california_housing_dataframe.head(10000))
+display.display(training_examples.describe())
+
+training_targets = preprocess_targets(california_housing_dataframe.head(10000))
+display.display(training_targets.describe())
+
+validation_examples = preprocess_features(california_housing_dataframe.tail(7000))
+display.display(validation_examples.describe())
+
+validation_targets = preprocess_targets(california_housing_dataframe.tail(7000))
+display.display(validation_targets.describe())
+
+
+def my_input_fn(features, targets, batch_size=1, shuffle=True, num_epochs=None):
+    """Trains a linear regression model of one feature.
+  
+    Args:
+      features: pandas DataFrame of features
+      targets: pandas DataFrame of targets
+      batch_size: Size of batches to be passed to the model
+      shuffle: True or False. Whether to shuffle the data.
+      num_epochs: Number of epochs for which data should be repeated. None = repeat indefinitely
+    Returns:
+      Tuple of (features, labels) for next data batch
+    """
+  
+    # Convert pandas data into a dict of np arrays.
+    features = {key:np.array(value) for key,value in dict(features).items()}                                           
+ 
+    # Construct a dataset, and configure batching/repeating
+    ds = Dataset.from_tensor_slices((features,targets)) # warning: 2GB limit
+    ds = ds.batch(batch_size).repeat(num_epochs)
+    
+    # Shuffle the data, if specified
+    if shuffle:
+      ds = ds.shuffle(buffer_size=10000)
+    
+    # Return the next batch of data
+    features, labels = ds.make_one_shot_iterator().get_next()
+    return features, labels
+
 
 def train_model(
     learning_rate,
@@ -178,7 +222,7 @@ def construct_feature_columns(input_features):
 
 def show_validation_training():
   plt.figure(figsize=(13, 8))
-  ax = plt.subplot(1, 2, 1)
+  ax = plt.subplot(1, 3, 1)
   ax.set_title("Validation Data")
 
   ax.set_autoscaley_on(False)
@@ -190,7 +234,7 @@ def show_validation_training():
               cmap="coolwarm",
               c=validation_targets["median_house_value"] / validation_targets["median_house_value"].max())
 
-  ax = plt.subplot(1,2,2)
+  ax = plt.subplot(1,3,2)
   ax.set_title("Training Data")
 
   ax.set_autoscaley_on(False)
@@ -201,17 +245,35 @@ def show_validation_training():
               training_examples["latitude"],
               cmap="coolwarm",
               c=training_targets["median_house_value"] / training_targets["median_house_value"].max())
+
+  ax = plt.subplot(1,3,3)
+  ax.set_title("All Data")
+
+  ax.set_autoscaley_on(False)
+  ax.set_ylim([32, 43])
+  ax.set_autoscalex_on(False)
+  ax.set_xlim([-126, -112])
+  plt.scatter(california_housing_dataframe["longitude"],
+              california_housing_dataframe["latitude"],
+              cmap="coolwarm",
+              c=california_housing_dataframe["median_house_value"] / california_housing_dataframe["median_house_value"].max())
+
   _ = plt.plot()
   plt.show()
 
-training_examples = preprocess_features(california_housing_dataframe.head(12000))
-display.display(training_examples.describe())
 
-training_targets = preprocess_targets(california_housing_dataframe.head(12000))
-display.display(training_targets.describe())
+def show_range(frame): 
+  ax = plt.subplot(1,1,1)
+  ax.set_title("Training Data")
 
-validation_examples = preprocess_features(california_housing_dataframe.tail(5000))
-display.display(validation_examples.describe())
+  ax.set_autoscaley_on(False)
+  ax.set_ylim([32, 43])
+  ax.set_autoscalex_on(False)
+  ax.set_xlim([-126, -112])
+  plt.scatter(frame["longitude"],
+              frame["latitude"],
+              cmap="coolwarm",
+              c=frame["median_house_value"] / frame["median_house_value"].max())
 
-validation_targets = preprocess_targets(california_housing_dataframe.tail(5000))
-display.display(validation_targets.describe())
+  _ = plt.plot()
+  plt.show()
