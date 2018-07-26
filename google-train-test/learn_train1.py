@@ -21,9 +21,6 @@ california_housing_dataframe = pd.read_csv("https://dl.google.com/mlcc/mledu-dat
 california_housing_dataframe = california_housing_dataframe.reindex(
     np.random.permutation(california_housing_dataframe.index))
 california_housing_dataframe["median_house_value"] /= 1000.0
-california_housing_dataframe
-
-california_housing_dataframe.describe()
 
 def my_input_fn(features, targets, batch_size=1, shuffle=True, num_epochs=None):
     """Trains a linear regression model of one feature.
